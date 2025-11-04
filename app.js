@@ -3,7 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const path = require('path');
 
-
 const app = express();
 const PORT = 3001;
 
@@ -54,14 +53,14 @@ app.post('/fetch', async (req, res) => {
     }).each(function() {
       // Replace text content but not in URLs or attributes
       const text = $(this).text();
-      const newText = text.replace(/Yale/g, 'Fail').replace(/yale/g, 'fail');
+      const newText = text.replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
       if (text !== newText) {
         $(this).replaceWith(newText);
       }
     });
     
     // Process title separately
-    const title = $('title').text().replace(/Yale/g, 'Fail').replace(/yale/g, 'fail');
+    const title = $('title').text().replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
     $('title').text(title);
     
     return res.json({ 

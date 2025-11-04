@@ -27,18 +27,25 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testEnvironmentOptions": {
+      "customExportConditions": ["node", "node-addons"]
+    },
+    "testMatch": ["**/tests/**/*.test.js"],
     "collectCoverageFrom": [
-      "**/*.js",
+      "tests/**/*.js",
       "!**/node_modules/**",
       "!**/coverage/**",
-      "!jest.config.js"
+      "!jest.config.js",
+      "!app.test.js",
+      "!tests/setup.js"
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 70,
-        "branches": 70,
-        "functions": 70,
-        "lines": 70
+        "statements": 80,
+        "branches": 80,
+        "functions": 80,
+        "lines": 80
       }
     }
   }
