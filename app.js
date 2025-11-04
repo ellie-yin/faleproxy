@@ -49,16 +49,16 @@ app.post('/fetch', async (req, res) => {
     }
     
     // Process text nodes in the body
-    $('body *').contents().filter(function() {
-      return this.nodeType === 3; // Text nodes only
-    }).each(function() {
-      // Replace text content but not in URLs or attributes
-      const text = $(this).text();
-      const newText = text.replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
-      if (text !== newText) {
-        $(this).replaceWith(newText);
-      }
-    });
+    // $('body *').contents().filter(function() {
+    //   return this.nodeType === 3; // Text nodes only
+    // }).each(function() {
+    //   // Replace text content but not in URLs or attributes
+    //   const text = $(this).text();
+    //   const newText = text.replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
+    //   if (text !== newText) {
+    //     $(this).replaceWith(newText);
+    //   }
+    // });
     
     // Process title separately
     // const title = $('title').text().replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
