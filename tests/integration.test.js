@@ -5,7 +5,6 @@ const { promisify } = require('util');
 const execAsync = promisify(exec);
 const { sampleHtmlWithYale } = require('./test-utils');
 const nock = require('nock');
-const fs = require('fs');
 
 // Set a different port for testing to avoid conflict with the main app
 const TEST_PORT = 3099;
@@ -16,17 +15,11 @@ describe('Integration Tests', () => {
   beforeAll(async () => {
     // Mock external HTTP requests
     nock.disableNetConnect();
-    // Allow connections to localhost on the test port
-    nock.enableNetConnect(`localhost:${TEST_PORT}`);
-    nock.enableNetConnect(`127.0.0.1:${TEST_PORT}`);
+    nock.enableNetConnect('127.0.0.1');
     
     // Create a temporary test app file
     await execAsync('cp app.js app.test.js');
-    
-    // Modify the PORT using Node.js fs instead of sed (more reliable cross-platform)
-    const appContent = fs.readFileSync('app.test.js', 'utf8');
-    const modifiedContent = appContent.replace(/const PORT = 3001/, `const PORT = ${TEST_PORT}`);
-    fs.writeFileSync('app.test.js', modifiedContent);
+    await execAsync(`sed -i '' 's/const PORT = 3001/const PORT = ${TEST_PORT}/' app.test.js`);
     
     // Start the test server
     server = require('child_process').spawn('node', ['app.test.js'], {
@@ -91,7 +84,6 @@ describe('Integration Tests', () => {
       // Should not reach here
       expect(true).toBe(false);
     } catch (error) {
-      expect(error.response).toBeDefined();
       expect(error.response.status).toBe(500);
     }
   });
@@ -102,7 +94,6 @@ describe('Integration Tests', () => {
       // Should not reach here
       expect(true).toBe(false);
     } catch (error) {
-      expect(error.response).toBeDefined();
       expect(error.response.status).toBe(400);
       expect(error.response.data.error).toBe('URL is required');
     }
