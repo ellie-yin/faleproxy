@@ -49,20 +49,20 @@ app.post('/fetch', async (req, res) => {
     }
     
     // Process text nodes in the body
-    // $('body *').contents().filter(function() {
-    //   return this.nodeType === 3; // Text nodes only
-    // }).each(function() {
-    //   // Replace text content but not in URLs or attributes
-    //   const text = $(this).text();
-    //   const newText = text.replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
-    //   if (text !== newText) {
-    //     $(this).replaceWith(newText);
-    //   }
-    // });
+    $('body *').contents().filter(function() {
+      return this.nodeType === 3; // Text nodes only
+    }).each(function() {
+      // Replace text content but not in URLs or attributes
+      const text = $(this).text();
+      const newText = text.replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
+      if (text !== newText) {
+        $(this).replaceWith(newText);
+      }
+    });
     
     // Process title separately
-    // const title = $('title').text().replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
-    // $('title').text(title);
+    const title = $('title').text().replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
+    $('title').text(title);
     
     return res.json({ 
       success: true, 
@@ -78,7 +78,11 @@ app.post('/fetch', async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Faleproxy server running at http://localhost:${PORT}`);
-});
+// Start the server only if not in test mode
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Faleproxy server running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

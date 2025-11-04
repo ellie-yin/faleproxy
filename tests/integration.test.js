@@ -1,59 +1,8 @@
 const request = require('supertest');
 const nock = require('nock');
-const express = require('express');
 const cheerio = require('cheerio');
-const axios = require('axios');
 const { sampleHtmlWithYale } = require('./test-utils');
-
-// Create a test app that mimics the main app's functionality
-function createTestApp() {
-  const app = express();
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-
-  app.post('/fetch', async (req, res) => {
-    try {
-      const { url } = req.body;
-      
-      if (!url) {
-        return res.status(400).json({ error: 'URL is required' });
-      }
-
-      const response = await axios.get(url);
-      const html = response.data;
-      
-      const $ = cheerio.load(html);
-      
-      // Process text nodes in the body
-      $('body *').contents().filter(function() {
-        return this.nodeType === 3; // Text nodes only
-      }).each(function() {
-        const text = $(this).text();
-        const newText = text.replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
-        if (text !== newText) {
-          $(this).replaceWith(newText);
-        }
-      });
-      
-      // Process title separately
-      const title = $('title').text().replace(/Yale/g, 'Fale').replace(/yale/g, 'fale');
-      $('title').text(title);
-      
-      return res.json({ 
-        success: true, 
-        content: $.html(),
-        title: title,
-        originalUrl: url
-      });
-    } catch (error) {
-      return res.status(500).json({ 
-        error: `Failed to fetch content: ${error.message}` 
-      });
-    }
-  });
-
-  return app;
-}
+const app = require('../app');
 
 describe('Integration Tests', () => {
   let app;
