@@ -16,7 +16,9 @@ describe('Integration Tests', () => {
   beforeAll(async () => {
     // Mock external HTTP requests
     nock.disableNetConnect();
-    nock.enableNetConnect('127.0.0.1');
+    // Allow connections to localhost on the test port
+    nock.enableNetConnect(`localhost:${TEST_PORT}`);
+    nock.enableNetConnect(`127.0.0.1:${TEST_PORT}`);
     
     // Create a temporary test app file
     await execAsync('cp app.js app.test.js');
@@ -89,6 +91,7 @@ describe('Integration Tests', () => {
       // Should not reach here
       expect(true).toBe(false);
     } catch (error) {
+      expect(error.response).toBeDefined();
       expect(error.response.status).toBe(500);
     }
   });
@@ -99,6 +102,7 @@ describe('Integration Tests', () => {
       // Should not reach here
       expect(true).toBe(false);
     } catch (error) {
+      expect(error.response).toBeDefined();
       expect(error.response.status).toBe(400);
       expect(error.response.data.error).toBe('URL is required');
     }
