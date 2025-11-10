@@ -17,3 +17,7 @@ if (typeof global.TextEncoder === 'undefined') {
   global.TextEncoder = TextEncoder;
   global.TextDecoder = TextDecoder;
 }
+
+// Suppress console.error during tests to avoid cluttering output
+// Tests intentionally trigger errors to verify error handling
+global.console.error = jest.fn();
