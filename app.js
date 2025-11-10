@@ -55,7 +55,7 @@ app.post('/fetch', async (req, res) => {
     //   if (match === 'yale') return 'fale';
     //   return 'Fale';
     // });
-    $('title').text(title);
+    // $('title').text(title);
     
     return res.json({ 
       success: true, 
