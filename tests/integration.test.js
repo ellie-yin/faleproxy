@@ -4,18 +4,23 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
 const { sampleHtmlWithYale } = require('./test-utils');
-const nock = require('nock');
+const express = require('express');
 
 // Set a different port for testing to avoid conflict with the main app
 const TEST_PORT = 3099;
+const MOCK_SERVER_PORT = 3100;
 let server;
+let mockServer;
 
 describe('Integration Tests', () => {
   // Modify the app to use a test port
   beforeAll(async () => {
-    // Mock external HTTP requests
-    nock.disableNetConnect();
-    nock.enableNetConnect('127.0.0.1');
+    // Create a local mock server to serve test content
+    const mockApp = express();
+    mockApp.get('/test-page', (req, res) => {
+      res.send(sampleHtmlWithYale);
+    });
+    mockServer = mockApp.listen(MOCK_SERVER_PORT);
     
     // Create a temporary test app file
     await execAsync('cp app.js app.test.js');
@@ -36,20 +41,16 @@ describe('Integration Tests', () => {
     if (server && server.pid) {
       process.kill(-server.pid);
     }
+    if (mockServer) {
+      mockServer.close();
+    }
     await execAsync('rm app.test.js');
-    nock.cleanAll();
-    nock.enableNetConnect();
   });
 
   test('Should replace Yale with Fale in fetched content', async () => {
-    // Setup mock for example.com
-    nock('https://example.com')
-      .get('/')
-      .reply(200, sampleHtmlWithYale);
-    
-    // Make a request to our proxy app
+    // Make a request to our proxy app, which will fetch from our local mock server
     const response = await axios.post(`http://localhost:${TEST_PORT}/fetch`, {
-      url: 'https://example.com/'
+      url: `http://localhost:${MOCK_SERVER_PORT}/test-page`
     });
     
     expect(response.status).toBe(200);
@@ -84,6 +85,7 @@ describe('Integration Tests', () => {
       // Should not reach here
       expect(true).toBe(false);
     } catch (error) {
+      expect(error.response).toBeDefined();
       expect(error.response.status).toBe(500);
     }
   });
@@ -94,6 +96,7 @@ describe('Integration Tests', () => {
       // Should not reach here
       expect(true).toBe(false);
     } catch (error) {
+      expect(error.response).toBeDefined();
       expect(error.response.status).toBe(400);
       expect(error.response.data.error).toBe('URL is required');
     }
