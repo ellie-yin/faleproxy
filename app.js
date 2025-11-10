@@ -3,7 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const path = require('path');
 
-
 const app = express();
 const PORT = 3001;
 
@@ -78,11 +77,7 @@ app.post('/fetch', async (req, res) => {
   }
 });
 
-// Start the server only if not in test mode
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Faleproxy server running at http://localhost:${PORT}`);
-  });
-}
-
-module.exports = app;
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Faleproxy server running at http://localhost:${PORT}`);
+});
