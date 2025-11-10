@@ -24,6 +24,14 @@ describe('API Endpoints', () => {
     nock.cleanAll();
   });
 
+  test('GET / should serve the main page', async () => {
+    const response = await request(app)
+      .get('/');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['content-type']).toContain('text/html');
+  });
+
   test('POST /fetch should return 400 if URL is missing', async () => {
     const response = await request(app)
       .post('/fetch')
@@ -63,5 +71,31 @@ describe('API Endpoints', () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toContain('Failed to fetch content');
+  });
+
+  test('POST /fetch should handle case-insensitive Yale replacements', async () => {
+    const mixedCaseHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><title>YALE and yale and Yale</title></head>
+      <body>
+        <p>YALE University, Yale College, and yale school</p>
+      </body>
+      </html>
+    `;
+
+    nock('https://test-case.com')
+      .get('/')
+      .reply(200, mixedCaseHtml);
+
+    const response = await request(app)
+      .post('/fetch')
+      .send({ url: 'https://test-case.com/' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.title).toBe('FALE and fale and Fale');
+    expect(response.body.content).toContain('FALE University');
+    expect(response.body.content).toContain('Fale College');
+    expect(response.body.content).toContain('fale school');
   });
 });
