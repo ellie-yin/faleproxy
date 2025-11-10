@@ -50,12 +50,12 @@ app.post('/fetch', async (req, res) => {
     });
     
     // Process title separately
-    // const title = $('title').text().replace(/Yale/gi, function(match) {
-    //   if (match === 'YALE') return 'FALE';
-    //   if (match === 'yale') return 'fale';
-    //   return 'Fale';
-    // });
-    // $('title').text(title);
+    const title = $('title').text().replace(/Yale/gi, function(match) {
+      if (match === 'YALE') return 'FALE';
+      if (match === 'yale') return 'fale';
+      return 'Fale';
+    });
+    $('title').text(title);
     
     return res.json({ 
       success: true, 
